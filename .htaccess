@@ -1,0 +1,6 @@
+Options +FollowSymlinks
+RewriteEngine on
+
+RewriteCond %REQUEST_URI !-f
+RewriteCond %REQUEST_URI !-d
+RewriteRule ^api/(v[0-9]+)/(.*)$ apis/api.php?api-version=$1&api-request=$2 [L,NC,QSA]
