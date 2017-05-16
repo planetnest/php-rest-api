@@ -103,13 +103,13 @@ abstract class API
             case 'DELETE':
             case 'PATCH':
             case 'POST':
-                $this->request = $this->_cleanInputs($_POST);
+                $this->request = $this->sanitize($_POST);
                 break;
             case 'GET':
-                $this->request = $this->_cleanInputs($_GET);
+                $this->request = $this->sanitize($_GET);
                 break;
             case 'PUT':
-                $this->request = $this->_cleanInputs($_GET);
+                $this->request = $this->sanitize($_GET);
                 $this->file = file('php://input');
                 break;
         }
@@ -128,12 +128,12 @@ abstract class API
      * @param $data
      * @return array|string
      */
-    private function _cleanInputs($data)
+    private function sanitize($data)
     {
         $clean_input = Array();
         if (is_array($data)) {
             foreach ($data as $k => $v) {
-                $clean_input[$k] = $this->_cleanInputs($v);
+                $clean_input[$k] = $this->sanitize($v);
             }
         } else {
             $clean_input = trim(strip_tags($data));
@@ -146,7 +146,7 @@ abstract class API
      * @param $code
      * @return mixed
      */
-    private function _requestStatus($code)
+    private function statusCode($code)
     {
         $status = array(
             200 => 'OK',
@@ -163,9 +163,9 @@ abstract class API
      * @param int $status
      * @return string
      */
-    private function _response($data, $status = 200)
+    private function response($data, $status = 200)
     {
-        header("HTTP/1.1 " . $status . " " . $this->_requestStatus($status));
+        header("HTTP/1.1 " . $status . " " . $this->statusCode($status));
         return json_encode($data);
     }
 
@@ -173,14 +173,14 @@ abstract class API
      * Performs the API operation
      * @return string
      */
-    public function processAPI()
+    public function execute()
     {
         $class = $this->getClass($this->entity);
 
         if ($class->hasMethod($this->endpoint)) {
-            return $this->_response($class->{$this->endpoint}($this));
+            return $this->response($class->{$this->endpoint}($this));
         }
-        return $this->_response("No Endpoint: $this->endpoint", 404);
+        return $this->response("No Endpoint: $this->endpoint", 404);
     }
 
     /**

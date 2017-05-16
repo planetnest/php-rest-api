@@ -16,4 +16,4 @@ switch (strtolower($_REQUEST['api-version'])) {
         break;
 }
 
-echo $api->processAPI();
+echo $api->execute();
