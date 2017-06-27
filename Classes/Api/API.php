@@ -61,7 +61,6 @@ abstract class API
      * API constructor.
      * Enabling CORS & sorting stuff
      * @param $request
-     * @throws \Exception
      */
     public function __construct($request)
     {
@@ -94,8 +93,7 @@ abstract class API
                     $this->method = 'PATCH';
                     break;
                 default:
-                    throw new \Exception("Invalid request method");
-                    break;
+                    die($this->_response("Invalid request method", 404));
             }
         }
 
@@ -120,7 +118,7 @@ abstract class API
      */
     private function dieTest()
     {
-        if (count($this->args) == 0) throw new \Exception("Invalid API request");
+        if (count($this->args) == 0) die($this->_response("Invalid API request", 404));
     }
 
     /**
@@ -186,12 +184,11 @@ abstract class API
     /**
      * @param $classname
      * @return \Apiable
-     * @throws \Exception
      */
     private function getClass($classname) {
         $classname = strtolower($classname);
 
-        if (!array_key_exists($classname, $this->class_tree)) throw new \Exception('API Invalid entity call');
+        if (!array_key_exists($classname, $this->class_tree)) die($this->_response("API Invalid entity call", 404));
         return new $this->class_tree[$classname];
     }
 }
